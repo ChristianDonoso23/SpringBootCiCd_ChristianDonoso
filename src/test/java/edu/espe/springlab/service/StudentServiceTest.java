@@ -39,13 +39,14 @@ public class StudentServiceTest {
 
         StudentCreateRequest req = new StudentCreateRequest();
         req.setFullName("New user");
-        req.setEmail(email);
+        req.setEmail("duplicate@example.com");
         req.setBirthDate(LocalDate.of(2001, 12, 1));
 
         // Act & Assert (Ejecutar y Verificar)
         // Verificamos que al intentar crear, se lance la excepción de conflicto
+        // En StudentServiceTest.java
         assertThatThrownBy(() -> service.create(req))
                 .isInstanceOf(ConflictException.class)
-                .hasMessageContaining("Email already exists"); // Opcional: verifica el mensaje si tu lógica lo incluye
+                .hasMessageContaining("El email ya esta registrado"); // Cambiado a español
     }
 }
