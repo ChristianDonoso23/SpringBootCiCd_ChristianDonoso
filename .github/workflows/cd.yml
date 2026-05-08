@@ -1,0 +1,18 @@
+name: Continuous Deployment
+
+on:
+  workflow_run:
+    # Este nombre debe ser EXACTAMENTE el 'name' de tu ci.yml
+    workflows: ["CI - Build and Test"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Esta condición asegura que el despliegue solo ocurra si el CI pasó con éxito
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Trigger Render Deploy Hook
+        run: |
+          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
