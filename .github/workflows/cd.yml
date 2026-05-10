@@ -17,19 +17,17 @@ jobs:
           curl -f -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
 
       - name: Trigger Rollback on Failure
-        # Esta condición se activa solo si el paso anterior falla
         if: failure()
         run: |
           echo "El despliegue falló. Iniciando rollback automático vía API de Render..."
           
-          # 1. Obtiene el ID del commit del último despliegue que funcionó (status="live")
+          # Ajuste aquí: Se añadió .deploy. a la ruta del JSON para leer correctamente la API de Render
           LAST_SUCCESSFUL_COMMIT=$(curl -s -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
             https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys \
-            | jq -r '[.[] | select(.status=="live")][0].commit.id')
+            | jq -r '[.[] | select(.deploy.status=="live")][0].deploy.commit.id')
 
           echo "Revirtiendo al commit seguro: $LAST_SUCCESSFUL_COMMIT"
 
-          # 2. Envía la orden a Render para redesplegar ese commit específico
           curl -X POST -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
             -H "Accept: application/json" \
             -H "Content-Type: application/json" \
